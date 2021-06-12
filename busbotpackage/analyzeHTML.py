@@ -12,19 +12,26 @@ class AnalyzeHTML:
     def __init__(self):
         print ("analyze call")
     
-    # def toString():
-        # print (f"{hourData}:{minuteData}")
-    
+    def addDataToDB(self, dataContent, positionArr, tableName):
+        pattern = re.compile(r'－|([0-9]{1,2})：([0-9]{1,2})')        # パターンマッチで内部の文字列が時間情報か確認
+        for tr_element in dataContent.find_all("tr"):         # タップルを読み込み
+            for td_element in tr_element.find_all("td"):
+                matchedResult = pattern.match(td_element.text)
+                if type(matchedResult) is re.Match:     
+                    msg = matchedResult.group()
+                    if matchedResult.group() != "－":
+                        result = self.convData(matchedResult.groups())
+
+
+    # 時間情報を数値データに変更する
+    def convData(self, str):
+        return [int(str[0]), int(str[1])]
+
     # データベースを新規作成するメソッド
     def getElement(self):
-        pattern = re.compile("－|[0-9]{1,2}：[0-9]{1,2}")        # パターンマッチで内部の文字列が時間情報か確認
         html = requests.get(self.siteName)                      # サイトを指定  
         soup = BeautifulSoup(html.content, "html.parser")       # 構文解析 
         dataTables = soup.find_all(class_="dataTable")          # テーブルを取得
-        for dataTable in dataTables:                            # 各テーブル内に処理実行(第一ループ: 豊中 -> 吹田, 第二ループ: 吹田 -> 豊中)
-            for tr_element in dataTable.find_all("tr"):         # タップルを読み込み
-                print ("----------------")
-                for td_element in tr_element.find_all("td"):
-                    a = pattern.match(td_element.text)
-                    if type(a) is re.Match:     
-                        print(a.group())
+
+        self.addDataToDB(dataTables[0], [0,1,2,4], "t2s")                         # テーブルに処理実行(豊中 -> 吹田)
+        self.addDataToDB(dataTables[1], [4,3,1,0], "s2t")                         # テーブルに処理実行(吹田 -> 豊中)

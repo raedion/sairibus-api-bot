@@ -5,14 +5,26 @@ import os
 from enum import Enum
 
 class ManageData:
+    # https://docs.python.org/ja/3/library/enum.html
     class Station(Enum):
         TOYONAKA = 0
         MINO = 1
         CONVENTION = 2
         JINKA = 3
         TECH = 4
+        def __str__(self):
+            if self.value == 0:
+                return "豊中"
+            elif self.value == 1:
+                return "箕面"
+            elif self.value == 2:
+                return "コンベンション前"
+            elif self.value == 3:
+                return "人間科学部前"
+            elif self.value == 4:
+                return "工学部前"
+
     fileName = ""
-    tableName = "timetable"
     def __init__(self):
         self.fileName = ""
     def __init__(self, fileName):
@@ -53,21 +65,39 @@ class ManageData:
         c.execute(f"INSERT INTO {tableName} ({', '.join(L)}) VALUES ({', '.join(V)})")
         conn.commit()
         conn.close()
-    
-    def addDatas(self):
-        conn = sqlite3.connect(self.fileName)
-        c = conn.cursor()
-        c.execute(f"INSERT INTO {self.tableName} (start, end, departure_h, departure_m) VALUES (0, 2, {hourData} ,{minuteData})")
-        c.execute(f"INSERT INTO {self.tableName} (start, end, departure_h, departure_m) VALUES (0, 2, {hourData + 1} ,{minuteData})")
-        conn.commit()
-        conn.close()
-
 
     # データを選択するメソッド
-    def selectData(self, hourData, minuteData):
-        conn = sqlite3.connect(self.fileName)
-        c = conn.cursor()
-        for result in c.execute(f"select * from {self.tableName} where departure_h >= {hourData} and departure_m >= {minuteData}"):
-            print(result)
-        conn.commit()
-        conn.close()
+    def selectData(self, hourData, minuteData, start, end):
+        tableName = "t2s" if start.value < end.value else "s2t"
+        returnVal = ""
+        try:
+            conn = sqlite3.connect(self.fileName)
+            c = conn.cursor()
+            for result in c.execute(self.createSelectQuery(
+                hourData, minuteData, tableName, start.name, end.name)):
+                returnVal = f"- {str(start)}({result[0]:02}:{result[1]:02}) -> {str(end)}({result[2]:02}:{result[3]:02})"
+                break
+            conn.commit()
+            conn.close()
+            return returnVal
+        except sqlite3.OperationalError as e:   # 何らかの原因でデータベースにアクセスできない時
+            print(e)                            # ログに出力
+
+    def selectAllData(self, hourData, minuteData):
+        msgList = []
+        msgList.append(self.selectData(hourData, minuteData, self.Station.TOYONAKA, self.Station.MINO))
+        msgList.append(self.selectData(hourData, minuteData, self.Station.TOYONAKA, self.Station.CONVENTION))
+        msgList.append(self.selectData(hourData, minuteData, self.Station.TOYONAKA, self.Station.TECH))
+        msgList.append(self.selectData(hourData, minuteData, self.Station.MINO, self.Station.TOYONAKA))
+        msgList.append(self.selectData(hourData, minuteData, self.Station.MINO, self.Station.CONVENTION))
+        msgList.append(self.selectData(hourData, minuteData, self.Station.MINO, self.Station.TECH))
+        msgList.append(self.selectData(hourData, minuteData, self.Station.TECH, self.Station.MINO))
+        msgList.append(self.selectData(hourData, minuteData, self.Station.TECH, self.Station.TOYONAKA))
+        msgList.append(self.selectData(hourData, minuteData, self.Station.JINKA, self.Station.MINO))
+        msgList.append(self.selectData(hourData, minuteData, self.Station.JINKA, self.Station.TOYONAKA))
+        return '\n'.join(msgList)
+
+    # データを選択するためのクエリを生成
+    # ifnull: 内部にnullが入っていた時のための関数でnullの時に第二引数を出力
+    def createSelectQuery(self, hourData, minuteData, tableName, start, end):
+        return f"SELECT ifnull({start}_h, -1), ifnull({start}_m, -1), ifnull({end}_h, -1), ifnull({end}_m, -1) FROM {tableName} WHERE ({start}_h == {hourData} and {start}_m >= {minuteData}) or ({start}_h > {hourData})"

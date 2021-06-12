@@ -1,6 +1,7 @@
 # coding: UTF-8
 
 import analyzeHTML
+import loadData
 
 fileName = 'timetable/20210611.db'
 # fileName = 'timetable/20210531.db'
@@ -17,10 +18,13 @@ def loadTime(hourData, minuteData):
 def selectData():
     print("")
 
+def renewData():
+    analyzer = analyzeHTML.AnalyzeHTML(fileName)
+    analyzer.getElement()
+
 def main():
-    # analyzer = analyzeHTML.AnalyzeHTML(fileName)
-    # analyzer.getElement()
-    
+    loader = loadData.LoadData(fileName)
+    loader.selectData(20, 40)
 
 if __name__ == '__main__':
     main()

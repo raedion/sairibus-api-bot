@@ -6,10 +6,10 @@ import manageData               # データベースをいじるクラス
 
 class LoadData:
     def __init__(self, fileName):
-        print (f"DB file is {fileName}")
         self.fileName = fileName
     
     def selectData(self, hourData, minuteData):
             manageDB = manageData.ManageData(self.fileName)
-            return manageDB.selectAllData(hourData, minuteData)
+            loadData = manageDB.selectAllData(hourData, minuteData)
+            return "本日の再履バスは終了しました！" if loadData == "" else loadData
             

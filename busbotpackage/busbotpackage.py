@@ -3,6 +3,7 @@
 import analyzeHTML
 import loadData
 import datetime                                         # 現在時刻を取得するために利用
+import re
 
 fileName = 'timetable/20210611.db'
 # fileName = 'timetable/20210531.db'
@@ -10,11 +11,25 @@ fileName = 'timetable/20210611.db'
 # DBはtimetableフォルダ直下のファイル. 作成日時を名前に採用. 
 
 # 時間を指定してその時間に対応するデータを取得
-def loadTime():
+def loadTime(msg = None):
+    hourData = 0
+    minuteData = 0
+    if msg is None:
+        dt_now = datetime.datetime.now()
+        hourData = dt_now.hour
+        minuteData = dt_now.minute
+    else:
+        val = re.match(r'([0-9]{2}):([0-9]{2})', msg)
+        if val is None:
+            dt_now = datetime.datetime.now()
+            hourData = dt_now.hour
+            minuteData = dt_now.minute     
+        else:
+            hourData = int(val[1])
+            minuteData = int(val[2])
     loader = loadData.LoadData(fileName)
-    dt_now = datetime.datetime.now()
-    returnVal = f"時刻[{dt_now.hour:02}:{dt_now.minute:02}]の直近に発車するバスの時間は以下の通りです\n"
-    returnVal = returnVal + loader.selectData(dt_now.hour, dt_now.minute)
+    returnVal = f"時刻[{hourData:02}:{minuteData:02}]の直近に発車するバスの時間は以下の通りです\n"
+    returnVal = returnVal + loader.selectData(hourData, minuteData)
     return returnVal
 
 def renewData():
@@ -22,7 +37,7 @@ def renewData():
     analyzer.getElement()
 
 def main():
-    print(loadTime())
+    print(renewData())
 
 if __name__ == '__main__':
     main()

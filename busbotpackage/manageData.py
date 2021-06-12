@@ -75,6 +75,8 @@ class ManageData:
             c = conn.cursor()
             for result in c.execute(self.createSelectQuery(
                 hourData, minuteData, tableName, start.name, end.name)):
+                if result[2] < 0 or result[3] < 0:
+                    continue
                 returnVal = f"- {str(start)}({result[0]:02}:{result[1]:02}) -> {str(end)}({result[2]:02}:{result[3]:02})\n"
                 break
             conn.commit()
@@ -82,6 +84,7 @@ class ManageData:
             return returnVal
         except sqlite3.OperationalError as e:   # 何らかの原因でデータベースにアクセスできない時
             print(e)                            # ログに出力
+            return ""
 
     def selectAllData(self, hourData, minuteData):
         msgList = []

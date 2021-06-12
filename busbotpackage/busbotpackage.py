@@ -1,17 +1,9 @@
 # coding: UTF-8
 
-from enum import Enum
 import analyzeHTML
 
 fileName = 'timetable/20210611.db'
 # fileName = 'timetable/20210531.db'
-
-class Station(Enum):
-    TOYONAKA = 0
-    MINO = 1
-    CONVENTION = 2
-    JINKA = 3
-    TECH = 4
 
 # DBはtimetableフォルダ直下のファイル. 作成日時を名前に採用. 
 
@@ -25,8 +17,10 @@ def loadTime(hourData, minuteData):
 def selectData():
     print("")
 
-def getResult():
-    analyzer = analyzeHTML.AnalyzeHTML()
-    analyzer.getElement()
+def main():
+    # analyzer = analyzeHTML.AnalyzeHTML(fileName)
+    # analyzer.getElement()
+    
 
-getResult()
+if __name__ == '__main__':
+    main()

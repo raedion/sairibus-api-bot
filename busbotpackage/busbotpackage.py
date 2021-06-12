@@ -15,13 +15,14 @@ def loadTime():
     dt_now = datetime.datetime.now()
     returnVal = f"時刻[{dt_now.hour:02}:{dt_now.minute:02}]の直近に発車するバスの時間は以下の通りです\n"
     returnVal = returnVal + loader.selectData(dt_now.hour, dt_now.minute)
-    print (returnVal)
+    return returnVal
 
 def renewData():
     analyzer = analyzeHTML.AnalyzeHTML(fileName)
     analyzer.getElement()
 
 def main():
-    loadTime()
+    print(loadTime())
+
 if __name__ == '__main__':
     main()

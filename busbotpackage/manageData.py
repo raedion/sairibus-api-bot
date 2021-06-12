@@ -75,7 +75,7 @@ class ManageData:
             c = conn.cursor()
             for result in c.execute(self.createSelectQuery(
                 hourData, minuteData, tableName, start.name, end.name)):
-                returnVal = f"- {str(start)}({result[0]:02}:{result[1]:02}) -> {str(end)}({result[2]:02}:{result[3]:02})"
+                returnVal = f"- {str(start)}({result[0]:02}:{result[1]:02}) -> {str(end)}({result[2]:02}:{result[3]:02})\n"
                 break
             conn.commit()
             conn.close()
@@ -95,7 +95,7 @@ class ManageData:
         msgList.append(self.selectData(hourData, minuteData, self.Station.TECH, self.Station.TOYONAKA))
         msgList.append(self.selectData(hourData, minuteData, self.Station.JINKA, self.Station.MINO))
         msgList.append(self.selectData(hourData, minuteData, self.Station.JINKA, self.Station.TOYONAKA))
-        return '\n'.join(msgList)
+        return ''.join(msgList)
 
     # データを選択するためのクエリを生成
     # ifnull: 内部にnullが入っていた時のための関数でnullの時に第二引数を出力

@@ -69,28 +69,35 @@ class ManageData:
     # データを選択するメソッド
     def selectData(self, hourData, minuteData, start, end):
         tableName = "t2s" if start.value < end.value else "s2t"
+        returnVal = ""
         try:
-
             conn = sqlite3.connect(self.fileName)
             c = conn.cursor()
             for result in c.execute(self.createSelectQuery(
                 hourData, minuteData, tableName, start.name, end.name)):
-                print (f"- {str(start)}({result[0]:02}:{result[1]:02}) -> {str(end)}({result[2]:02}:{result[3]:02})")
+                returnVal = f"- {str(start)}({result[0]:02}:{result[1]:02}) -> {str(end)}({result[2]:02}:{result[3]:02})"
                 break
             conn.commit()
             conn.close()
+            return returnVal
         except sqlite3.OperationalError as e:   # 何らかの原因でデータベースにアクセスできない時
             print(e)                            # ログに出力
 
     def selectAllData(self, hourData, minuteData):
-        self.selectData(hourData, minuteData, self.Station.TOYONAKA, self.Station.MINO)
-        self.selectData(hourData, minuteData, self.Station.TOYONAKA, self.Station.CONVENTION)
-        self.selectData(hourData, minuteData, self.Station.TOYONAKA, self.Station.TECH)
-        self.selectData(hourData, minuteData, self.Station.MINO, self.Station.TOYONAKA)
-        self.selectData(hourData, minuteData, self.Station.MINO, self.Station.CONVENTION)
-        self.selectData(hourData, minuteData, self.Station.MINO, self.Station.TECH)
-        self.selectData(hourData, minuteData, self.Station.TECH, self.Station.MINO)
-        self.selectData(hourData, minuteData, self.Station.TECH, self.Station.TOYONAKA)
+        msgList = []
+        msgList.append(self.selectData(hourData, minuteData, self.Station.TOYONAKA, self.Station.MINO))
+        msgList.append(self.selectData(hourData, minuteData, self.Station.TOYONAKA, self.Station.CONVENTION))
+        msgList.append(self.selectData(hourData, minuteData, self.Station.TOYONAKA, self.Station.TECH))
+        msgList.append(self.selectData(hourData, minuteData, self.Station.MINO, self.Station.TOYONAKA))
+        msgList.append(self.selectData(hourData, minuteData, self.Station.MINO, self.Station.CONVENTION))
+        msgList.append(self.selectData(hourData, minuteData, self.Station.MINO, self.Station.TECH))
+        msgList.append(self.selectData(hourData, minuteData, self.Station.TECH, self.Station.MINO))
+        msgList.append(self.selectData(hourData, minuteData, self.Station.TECH, self.Station.TOYONAKA))
+        msgList.append(self.selectData(hourData, minuteData, self.Station.JINKA, self.Station.MINO))
+        msgList.append(self.selectData(hourData, minuteData, self.Station.JINKA, self.Station.TOYONAKA))
+        return '\n'.join(msgList)
 
+    # データを選択するためのクエリを生成
+    # ifnull: 内部にnullが入っていた時のための関数でnullの時に第二引数を出力
     def createSelectQuery(self, hourData, minuteData, tableName, start, end):
         return f"SELECT ifnull({start}_h, -1), ifnull({start}_m, -1), ifnull({end}_h, -1), ifnull({end}_m, -1) FROM {tableName} WHERE ({start}_h == {hourData} and {start}_m >= {minuteData}) or ({start}_h > {hourData})"

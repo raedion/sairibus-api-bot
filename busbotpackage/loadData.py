@@ -11,5 +11,5 @@ class LoadData:
     
     def selectData(self, hourData, minuteData):
             manageDB = manageData.ManageData(self.fileName)
-            manageDB.selectAllData(hourData, minuteData)
+            return manageDB.selectAllData(hourData, minuteData)
             

@@ -17,8 +17,10 @@ def loadTime(hourData, minuteData):
 def selectData():
     print("")
 
-def getResult():
-    analyzer = analyzeHTML.AnalyzeHTML(fileName)
-    analyzer.getElement()
+def main():
+    # analyzer = analyzeHTML.AnalyzeHTML(fileName)
+    # analyzer.getElement()
+    
 
-getResult()
+if __name__ == '__main__':
+    main()

@@ -8,6 +8,7 @@ import requests                 # install requests
 import re                       # デフォルトで入っている
 import manageData               # データベースをいじるクラス
 
+
 class AnalyzeHTML:
     siteName = "https://www.osaka-u.ac.jp/ja/access/bus.html"
     fileName = ""

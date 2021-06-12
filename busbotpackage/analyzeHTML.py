@@ -6,6 +6,7 @@
 from bs4 import BeautifulSoup   # install beautifulsoup4
 import requests                 # install requests 
 import re
+import manageData
 
 class AnalyzeHTML:
     siteName = "https://www.osaka-u.ac.jp/ja/access/bus.html"

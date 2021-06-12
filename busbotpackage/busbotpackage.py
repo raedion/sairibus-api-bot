@@ -29,4 +29,4 @@ def getResult():
     analyzer = analyzeHTML.AnalyzeHTML()
     analyzer.getElement()
 
-getResult()
+getResult(fileName)

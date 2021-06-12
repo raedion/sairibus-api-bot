@@ -6,11 +6,14 @@
 from bs4 import BeautifulSoup   # install beautifulsoup4
 import requests                 # install requests 
 import re
+import manageData
 
 class AnalyzeHTML:
     siteName = "https://www.osaka-u.ac.jp/ja/access/bus.html"
-    def __init__(self):
-        print ("analyze call")
+    fileName = ""
+    def __init__(self, fileName):
+        print (f"DB file is {fileName}")
+        self.fileName = fileName
     
     def addDataToDB(self, dataContent, positionArr, tableName):
         pattern = re.compile(r'－|([0-9]{1,2})：([0-9]{1,2})')        # パターンマッチで内部の文字列が時間情報か確認

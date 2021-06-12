@@ -5,8 +5,8 @@
 
 from bs4 import BeautifulSoup   # install beautifulsoup4
 import requests                 # install requests 
-import re
-import manageData
+import re                       # デフォルトで入っている
+import manageData               # データベースをいじるクラス
 
 class AnalyzeHTML:
     siteName = "https://www.osaka-u.ac.jp/ja/access/bus.html"
@@ -16,15 +16,23 @@ class AnalyzeHTML:
         self.fileName = fileName
     
     def addDataToDB(self, dataContent, positionArr, tableName):
+        # print (manageDB.Station(0).name)
         pattern = re.compile(r'－|([0-9]{1,2})：([0-9]{1,2})')        # パターンマッチで内部の文字列が時間情報か確認
         for tr_element in dataContent.find_all("tr"):         # タップルを読み込み
+            L = []
+            i = 0
             for td_element in tr_element.find_all("td"):
                 matchedResult = pattern.match(td_element.text)
                 if type(matchedResult) is re.Match:     
                     msg = matchedResult.group()
                     if matchedResult.group() != "－":
                         result = self.convData(matchedResult.groups())
-
+                        L.append([positionArr[i],result])
+                    i += 1
+            # print (L)
+            manageDB = manageData.ManageData(self.fileName)
+            manageDB.addData(L, tableName)
+            
 
     # 時間情報を数値データに変更する
     def convData(self, str):
@@ -35,6 +43,9 @@ class AnalyzeHTML:
         html = requests.get(self.siteName)                      # サイトを指定  
         soup = BeautifulSoup(html.content, "html.parser")       # 構文解析 
         dataTables = soup.find_all(class_="dataTable")          # テーブルを取得
+
+        manageDB = manageData.ManageData(self.fileName)
+        manageDB.createDataTable()
 
         self.addDataToDB(dataTables[0], [0,1,2,4], "t2s")                         # テーブルに処理実行(豊中 -> 吹田)
         self.addDataToDB(dataTables[1], [4,3,1,0], "s2t")                         # テーブルに処理実行(吹田 -> 豊中)

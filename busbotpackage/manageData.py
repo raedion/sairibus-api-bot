@@ -82,6 +82,7 @@ class ManageData:
             return returnVal
         except sqlite3.OperationalError as e:   # 何らかの原因でデータベースにアクセスできない時
             print(e)                            # ログに出力
+            return ""
 
     def selectAllData(self, hourData, minuteData):
         msgList = []

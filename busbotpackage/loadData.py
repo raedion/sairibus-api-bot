@@ -10,5 +10,6 @@ class LoadData:
     
     def selectData(self, hourData, minuteData):
             manageDB = manageData.ManageData(self.fileName)
-            return manageDB.selectAllData(hourData, minuteData)
+            loadData = manageDB.selectAllData(hourData, minuteData)
+            return "本日の再履バスは終了しました！" if loadData == "" else loadData
             
